@@ -17,7 +17,7 @@ st.markdown("""
 
 # Base de dados completa (Hardcoded)
 alunos = {
-    339418: {"nome": "ANA JÚLIA MORAES VASCONCELOS", "nota": 50.8},
+    339418: {"nome": "ANA JÚLIA MORAES VASCONCELOS", "nota": 82.9},
     338363: {"nome": "ANA PAULA MEDEIROS POLACK", "nota": 82.3},
     330047: {"nome": "ANDRÉ LUIS DO NASCIMENTO DE PAULA", "nota": 88.1},
     218553: {"nome": "ARTHUR KIRMSE ROCHA", "nota": 79.6},
