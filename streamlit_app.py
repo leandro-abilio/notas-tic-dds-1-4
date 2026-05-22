@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import io
 
 st.set_page_config(page_title="Portal de Notas", page_icon="🎓", layout="centered")
 
@@ -17,7 +18,8 @@ st.markdown("""
 # Carrega os dados do CSV — só isso substitui todo o dicionário hardcoded!
 @st.cache_data
 def carregar_alunos():
-    df = pd.read_csv("alunos.csv", dtype={"ra": int})
+    csv_texto = st.secrets["alunos"]["dados"]
+    df = pd.read_csv(io.StringIO(csv_texto), dtype={"ra": int})
     return df.set_index("ra").to_dict(orient="index")
 
 alunos = carregar_alunos()
