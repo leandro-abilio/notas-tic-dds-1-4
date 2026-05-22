@@ -19,8 +19,8 @@ st.markdown("""
 FILE_ID = "1QbcgF1NekGWxwuXXitzhRIVSnyftk_w1"
 DOWNLOAD_URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
 
-@st.cache_data(ttl=300)  # Atualiza a cada 5 minutos
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=10)  # Atualiza a cada 5 minutos
+@st.cache_data(ttl=10)
 def carregar_todos_alunos():
     response = requests.get(DOWNLOAD_URL)
     response.raise_for_status()
