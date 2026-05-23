@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import io
-import requests
 
 st.set_page_config(page_title="Portal de Notas", page_icon="🎓", layout="centered")
 
@@ -16,43 +15,33 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-FILE_ID = "1QbcgF1NekGWxwuXXitzhRIVSnyftk_w1"
-DOWNLOAD_URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
-
-@st.cache_data(ttl=10)  # Atualiza a cada 5 minutos
-@st.cache_data(ttl=10)
+@st.cache_data
 def carregar_todos_alunos():
-    response = requests.get(DOWNLOAD_URL)
-    response.raise_for_status()
-    
-    xls = pd.ExcelFile(io.BytesIO(response.content))
     todos = {}
-    
-    for turma in xls.sheet_names:
-        df = pd.read_excel(xls, sheet_name=turma, dtype={"RA": int})
+    for turma, dados in st.secrets.items():
+        df = pd.read_csv(io.StringIO(dados["dados"]), dtype={"RA": int})
         df.columns = df.columns.str.strip()
-        
+
         # Tudo que não for RA ou Nome é matéria — automático!
         colunas_materias = [c for c in df.columns if c not in ("RA", "Nome")]
-        
+
         for _, row in df.iterrows():
             try:
                 ra = int(row["RA"])
             except (ValueError, KeyError):
                 continue
-            
+
             notas = {
                 col: row[col]
                 for col in colunas_materias
                 if pd.notna(row.get(col))
             }
-            
+
             todos[ra] = {
                 "nome": row["Nome"],
-                "turma": turma,
+                "turma": turma.upper(),
                 "notas": notas
             }
-    
     return todos
 
 st.title("🎓 Portal de Notas")
@@ -64,14 +53,14 @@ if st.button("Consultar Notas"):
     if ra_input.strip():
         try:
             ra_digitado = int(ra_input)
-            
+
             with st.spinner("Carregando..."):
                 try:
                     alunos = carregar_todos_alunos()
                 except Exception:
-                    st.error("❌ Não foi possível carregar os dados. Tente novamente em instantes.")
+                    st.error("❌ Não foi possível carregar os dados. Tente novamente.")
                     st.stop()
-            
+
             if ra_digitado in alunos:
                 aluno = alunos[ra_digitado]
                 st.success("✨ Acesso Autorizado!")
@@ -79,7 +68,7 @@ if st.button("Consultar Notas"):
                 st.markdown(f"### 👤 {aluno['nome']}")
                 st.markdown(f"**Turma:** {aluno['turma']}")
                 st.divider()
-                
+
                 if aluno["notas"]:
                     st.markdown("#### 📋 Boletim")
                     cols = st.columns(len(aluno["notas"]))
